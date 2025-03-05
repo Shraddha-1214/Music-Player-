@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Music Player</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #0f0c29, #302b63, #24243e);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+        .player {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            width: 320px;
+            position: relative;
+        }
+        .cover {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        .track-info {
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            box-shadow: 0 0 15px #00c6ff;
+        }
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-top: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress {
+            height: 5px;
+            background: #ff416c;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="player">
+        <img id="cover" class="cover" src="cover1.jpg" alt="Cover">
+        <div class="track-info" id="track-info">Song 1 - Artist 1</div>
+        <audio id="audio" src="song1.mp3"></audio>
+        <div class="progress-container" onclick="setProgress(event)">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="controls">
+            <button onclick="prevTrack()">⏮</button>
+            <button onclick="togglePlay()" id="playButton">▶️</button>
+            <button onclick="nextTrack()">⏭</button>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById("audio");
+        const cover = document.getElementById("cover");
+        const trackInfo = document.getElementById("track-info");
+        const playButton = document.getElementById("playButton");
+        const progress = document.getElementById("progress");
+        const progressContainer = document.querySelector(".progress-container");
+
+        const tracks = [
+        { src: "bodyguard_bgm.mp3", cover: "bodyguard_bgm.jpg", name: "Bodyguard BGM" },
+        { src: "o_sajni_re.mp3", cover: "o_sajni_re.jpg", name: "O Sajni Re" },
+        { src: "jaana_samjho_na.mp3", cover: "jaana_samjho_na.jpg", name: "Jaana Samjho Na" }
+    ];
+    
+        
+        let currentTrack = 0;
+        let isPlaying = false;
+
+        function loadTrack(index) {
+            audio.src = tracks[index].src;
+            cover.src = tracks[index].cover;
+            trackInfo.textContent = tracks[index].name;
+            audio.pause();
+            isPlaying = false;
+            playButton.textContent = "▶️";
+        }
+        
+        function togglePlay() {
+            if (!isPlaying) {
+                audio.play();
+                playButton.textContent = "⏸";
+            } else {
+                audio.pause();
+                playButton.textContent = "▶️";
+            }
+            isPlaying = !isPlaying;
+        }
+        
+        function nextTrack() {
+            currentTrack = (currentTrack + 1) % tracks.length;
+            loadTrack(currentTrack);
+            togglePlay();
+        }
+        
+        function prevTrack() {
+            currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+            loadTrack(currentTrack);
+            togglePlay();
+        }
+        
+        function updateProgress() {
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = `${progressPercent}%`;
+        }
+
+        function setProgress(event) {
+            const width = progressContainer.clientWidth;
+            const clickX = event.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        audio.addEventListener("timeupdate", updateProgress);
+        audio.addEventListener("ended", () => {
+            playButton.textContent = "▶️";
+            isPlaying = false;
+        });
+        
+        loadTrack(currentTrack);
+    </script>
+</body>
+</html>
